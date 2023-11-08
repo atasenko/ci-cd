@@ -1,31 +1,26 @@
-### Знакомство с SonarQube  
-- SonarQube развернут  
-- Проект создан  
-- Пакет sonar-scanner скачан, распакован, добавлен в PATH  
-- sonar-scanner --version  
-    INFO: Scanner configuration file: /opt/sonar-scanner/conf/sonar-scanner.properties  
-    INFO: Project root configuration file: NONE  
-    INFO: SonarScanner 5.0.1.3006  
-    INFO: Java 17.0.7 Eclipse Adoptium (64-bit)  
-    INFO: Linux 6.2.0-33-generic amd64  
-- Анализатор запущен  
-- Результат - один bug и один code smells  
-- Ошибки исправлены  
-- Анализатор запущен повторно, вот скриншот:  
-![SonarQube](img/cicd03-01.png)  
+### Подготовка  
+- Созданы и запущены необходимые ВМ  
+- Выполнена первоначальная настройка Teamcity  
+- Сделан fork репозитория  
+- Nexus развернут используя приведенный playbook  
 
-### Знакомство с Nexus  
-Создал два пустых файла для имитации дистрибутивов, загрузил их с указанными параметрами, вот [maven-metadata.xml](files/maven-metadata.xml)  
-
-### Знакомство с Maven  
-- Maven скачал, распаковал, закомментировал секцию запрещающую HTTP соединения.  
-- mvn --version
-    Apache Maven 3.9.4 (dfbb324ad4a7c8fb0bf182e6d91b0ae20e3d2dd9)  
-    Maven home: /opt/apache-maven  
-    Java version: 11.0.20.1, vendor: Ubuntu, runtime: /usr/lib/jvm/java-11-openjdk-amd64  
-    Default locale: ru_RU, platform encoding: UTF-8  
-    OS name: "linux", version: "6.2.0-33-generic", arch: "amd64", family: "unix  
-- Положил директорию с pom к себе в репозиторий  
-- Изменил в [pom.xml](mvn/pom.xml) блок с зависимостями под свой артефакт из задания для Nexus  
-- Запустил команду mvn package, всё произошло:  
-![dependency](img/cicd03-02.png)  
+### Основная часть  
+- Новый проект на основе fork репозитория создан
+- Autodetect конфигурации состоялся, первая сборка ветки master запущена  
+![first build](img/ci-cd-05_1.png)  
+- В файл settings.xml вписан измененный пароль nexus, файл импортирован в Teamcity  
+- Условия сборки изменены на "clean deploy" по ветке master  
+- После нескольких неудачных попыток изменения файла settings.xml новый запуск отработал без ошибок  
+![Done](img/ci-cd-05_2.png)  
+- Артефакт появился в nexus  [settings.xml](..%2Ftemp%2Fmnt-homeworks%2F09-ci-05-teamcity%2Fteamcity%2Fsettings.xml)
+![build success](img/ci-cd-05_3.png)  
+- Мигрировал (включил синхронизацию) проекта с VCS  
+- Создал отдельную ветку feature/add_reply в репозитории, написал новый метод содержащий слово hunter, дополнил тест для нового метода  
+- Сделал push в новую ветку репозитория, убедился что сборка запустилась самостоятельно и тесты прошли успешно  
+![New branch done](img/ci-cd-05_4.png)  
+- Внес изменения из новой ветки в master через Merge  
+- Убедился что нового артефакта в сборке по ветке master нет  
+- Нет его по двум причинам. Почему-то при запуске в первый раз в файле pom был старый адрес сервера Nexus (он обновился из-за прерывания ВМ), хотя я вписал новый адрес сразу после запуска и изменения ушли вместе с остальными коммитами. При следующих запусках я получил ошибку в моем вольном переводе звучащую как "В репозитории nexus запрещено изменение объектов"  
+- Изменил версию на 0.0.2 -> commit -> push -> Pull request -> Merge -> сборка по ветке master и вот результат:  
+![tada!](img/ci-cd-05_5.png)  
+- Конфигурация Teamcity в репозитории находится [здесь](https://github.com/atasenko/example-teamcity/tree/master/.teamcity) и содержит все настройки  
