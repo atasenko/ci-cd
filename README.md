@@ -12,7 +12,7 @@
 - Условия сборки изменены на "clean deploy" по ветке master  
 - После нескольких неудачных попыток изменения файла settings.xml новый запуск отработал без ошибок  
 ![Done](img/ci-cd-05_2.png)  
-- Артефакт появился в nexus  [settings.xml](..%2Ftemp%2Fmnt-homeworks%2F09-ci-05-teamcity%2Fteamcity%2Fsettings.xml)
+- Артефакт появился в nexus  
 ![build success](img/ci-cd-05_3.png)  
 - Мигрировал (включил синхронизацию) проекта с VCS  
 - Создал отдельную ветку feature/add_reply в репозитории, написал новый метод содержащий слово hunter, дополнил тест для нового метода  
